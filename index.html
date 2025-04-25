@@ -1,0 +1,25 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Web4 AI Project Assistant</title>
+</head>
+<body>
+  <h1>Web4 AI Project Assistant</h1>
+
+  <input type="file" id="fileInput" multiple><br><br>
+  <button onclick="loadFromLocalStorage()">Load from LocalStorage</button>
+  <button onclick="runAIRefactor()">AI Refactor + Organize</button>
+  <button onclick="downloadProject()">Download Project</button>
+  <button onclick="saveToLocal()">Save Locally</button>
+  <button onclick="toggleAI()">Toggle AI Mode (Online / Offline)</button>
+
+  <pre id="output"></pre>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://unpkg.com/localforage/dist/localforage.min.js"></script>
+  <script src="https://mlc.ai/web-llm/dist/index.js"></script>
+  <script src="assistant.js"></script>
+</body>
+</html>
