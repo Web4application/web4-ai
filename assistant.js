@@ -101,3 +101,147 @@ function loadFromLocalStorage() {
     }
   });
 }
+
+async function runAIRefactor() {
+  for (let i = 0; i < projectFiles.length; i++) {
+    // Refactor code using AI
+    const refactored = isOnlineAI ? 
+      await realAIRefactor(projectFiles[i].code) : 
+      await localAIRefactor(projectFiles[i].code);
+    
+    // Analyze code complexity
+    const complexityReport = await analyzeCodeComplexity(refactored);
+    console.log(`Complexity report for ${projectFiles[i].name}:`, complexityReport);
+
+    // Generate documentation
+    const documentation = await generateDocumentation(refactored);
+    console.log(`Generated documentation for ${projectFiles[i].name}:`, documentation);
+
+    // Format the code
+    const formattedCode = await formatCode(refactored);
+    console.log(`Formatted code for ${projectFiles[i].name}:`, formattedCode);
+
+    // Generate unit tests
+    const unitTests = await generateUnitTests(refactored);
+    console.log(`Generated unit tests for ${projectFiles[i].name}:`, unitTests);
+
+    // Add comments to code
+    const commentedCode = await addCodeComments(formattedCode);
+    console.log(`Commented code for ${projectFiles[i].name}:`, commentedCode);
+
+    // Update the file with the final version
+    projectFiles[i].code = commentedCode;
+    projectFiles[i].status = 'refactored and commented';
+  }
+  displayOutput();
+}
+
+// Function to analyze code complexity and suggest improvements (AI-powered)
+async function analyzeCodeComplexity(code) {
+  const analysisPrompt = `Analyze the following code and provide a complexity report and suggestions for optimization. Code:\n\n${code}`;
+  
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': 'AIzaSyAvrxOyAVzPVcnzxuD0mjKVDyS2bNWfC10',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      model: 'gpt-4',
+      messages: [
+        { role: 'system', content: 'You are a software engineer specializing in code analysis.' },
+        { role: 'user', content: analysisPrompt }
+      ]
+    })
+  });
+  const data = await response.json();
+  return data.choices[0].message.content.trim();
+}
+
+// Function to generate documentation for code using AI
+async function generateDocumentation(code) {
+  const docPrompt = `Generate documentation for the following code:\n\n${code}`;
+  
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': 'AIzaSyAvrxOyAVzPVcnzxuD0mjKVDyS2bNWfC10',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      model: 'gpt-4',
+      messages: [
+        { role: 'system', content: 'You are an expert software documentation generator.' },
+        { role: 'user', content: docPrompt }
+      ]
+    })
+  });
+  const data = await response.json();
+  return data.choices[0].message.content.trim();
+}
+
+// Function to format code using AI
+async function formatCode(code) {
+  const formatPrompt = `Format the following code to meet standard style conventions:\n\n${code}`;
+  
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': 'AIzaSyAvrxOyAVzPVcnzxuD0mjKVDyS2bNWfC10',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      model: 'gpt-4',
+      messages: [
+        { role: 'system', content: 'You are an expert code formatter.' },
+        { role: 'user', content: formatPrompt }
+      ]
+    })
+  });
+  const data = await response.json();
+  return data.choices[0].message.content.trim();
+}
+
+// Function to generate unit tests for code
+async function generateUnitTests(code) {
+  const testPrompt = `Generate unit tests for the following code using the appropriate testing framework (e.g., Jest, Mocha):\n\n${code}`;
+  
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': 'AIzaSyAvrxOyAVzPVcnzxuD0mjKVDyS2bNWfC10',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      model: 'gpt-4',
+      messages: [
+        { role: 'system', content: 'You are a test generation AI.' },
+        { role: 'user', content: testPrompt }
+      ]
+    })
+  });
+  const data = await response.json();
+  return data.choices[0].message.content.trim();
+}
+
+// Function to add comments to code
+async function addCodeComments(code) {
+  const commentPrompt = `Add comments to the following code to explain each function, variable, and complex logic:\n\n${code}`;
+  
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': 'AIzaSyAvrxOyAVzPVcnzxuD0mjKVDyS2bNWfC10',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      model: 'gpt-4',
+      messages: [
+        { role: 'system', content: 'You are a code commenting AI.' },
+        { role: 'user', content: commentPrompt }
+      ]
+    })
+  });
+  const data = await response.json();
+  return data.choices[0].message.content.trim();
+}
