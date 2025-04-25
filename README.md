@@ -1,6 +1,6 @@
 # Web4AI Project Assistant
 
-A lightweight, browser-based AI assistant designed to help you refactor, document, analyze, and organize your code using both online (GPT-4) and offline (WebLLM) AI models.
+Web4AI Project Assistant is a web-based tool designed to enhance developers' productivity by utilizing AI (GPT-4 & WebLLM). It helps automate code refactoring, generates documentation, adds inline comments, and creates unit tests. The tool supports both online and offline AI models, offers local file syncing, and allows easy project export as a ZIP file. Ideal for improving code quality, readability, and maintainability, Web4AI simplifies complex development tasks in an intuitive interface..
 
 ## Features
 
