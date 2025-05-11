@@ -37,3 +37,10 @@ exports.getTaskForecasts = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+const { io } = require("../server");
+
+exports.notifyTaskUpdates = async () => {
+  const tasks = await Task.find({}).select("title status completionProbability");
+  io.emit("taskUpdates", tasks);
+};
