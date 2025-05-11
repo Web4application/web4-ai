@@ -1,4 +1,5 @@
 import React from "react";
+import AdvancedChart from "./AdvancedChart";
 import PredictiveAnalytics from "./PredictiveAnalytics";
 import RealtimeUpdates from "./RealtimeUpdates";
 
@@ -10,6 +11,7 @@ const InsightsDashboard: React.FC = () => {
         <PredictiveAnalytics />
         <RealtimeUpdates />
       </div>
+      <AdvancedChart />
     </div>
   );
 };
