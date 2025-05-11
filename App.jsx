@@ -1,60 +1,37 @@
-// App.jsx - Web4AI Project Assistant
+// src/App.jsx
 
-import React, { useState } from 'react';
-import './App.css';
-import CodeAssistance from './components/CodeAssistance';
-import FileManager from './components/FileManager';
-import Footer from './components/Footer';
+import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import HomePage from './pages/HomePage';
+import AboutPage from './pages/AboutPage';
+import ContactPage from './pages/ContactPage';
+import Footer from './components/Footer';
 
 const App = () => {
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleFileUpload = (event) => {
-    setIsLoading(true);
-    // Handle file upload logic here
-    // You could use FileReader API or upload via a backend API
-    // After file processing, set isLoading(false);
-  };
-
-  const handleCodeRefactor = async (codeSnippet) => {
-    setIsLoading(true);
-    // Example API call or AI processing function for code refactoring
-    // const refactoredCode = await refactorCode(codeSnippet);
-    setIsLoading(false);
-  };
-
   return (
     <Router>
       <div className="App">
         <header className="App-header">
           <h1>Web4AI Project Assistant</h1>
-          <p>AI-powered tools to assist with your software development workflow.</p>
+          <nav>
+            <a href="/">Home</a>
+            <a href="/about">About</a>
+            <a href="/contact">Contact</a>
+          </nav>
         </header>
 
         <main>
           <Switch>
-            <Route exact path="/">
-              <section>
-                <h2>Code Assistance</h2>
-                <CodeAssistance onRefactor={handleCodeRefactor} />
-              </section>
-
-              <section>
-                <h2>File Management</h2>
-                <FileManager onFileUpload={handleFileUpload} />
-              </section>
-            </Route>
-            {/* Add more routes here if needed */}
+            <Route exact path="/" component={HomePage} />
+            <Route path="/about" component={AboutPage} />
+            <Route path="/contact" component={ContactPage} />
           </Switch>
         </main>
-
-        {isLoading && <div className="loading-spinner">Processing...</div>}
 
         <Footer />
       </div>
     </Router>
   );
-}
+};
 
 export default App;
