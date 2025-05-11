@@ -24,7 +24,7 @@ const AIInsights: React.FC = () => {
       const reply = await interactWithLola(lolaMessage);
       setResponse(reply);
     } catch (error) {
-      console.error("Lola interaction error:", error);
+      console.error("Error interacting with Lola:", error);
     }
   };
 
@@ -34,7 +34,7 @@ const AIInsights: React.FC = () => {
 
       <textarea
         className="w-full p-2 mb-2 border border-gray-300 rounded"
-        placeholder="Ask Lola about task insights..."
+        placeholder="Ask Lola for project insights..."
         value={lolaMessage}
         onChange={(e) => setLolaMessage(e.target.value)}
       />
@@ -45,11 +45,11 @@ const AIInsights: React.FC = () => {
 
       {response && <p className="mt-4 bg-white p-2 rounded shadow">{response}</p>}
 
-      <h3 className="mt-4 text-lg font-bold">Task Analysis:</h3>
+      <h3 className="mt-4 text-lg font-bold">Task Recommendations:</h3>
       {tasks.map((task) => (
         <div key={task._id} className="bg-white p-2 mb-2 rounded shadow">
           <h4>{task.title}</h4>
-          <p>{task.analysis || "No analysis available"}</p>
+          <p>{task.analysis || "No AI insights available."}</p>
         </div>
       ))}
     </div>
