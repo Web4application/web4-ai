@@ -15,4 +15,10 @@ notificationSent: {
   default: false
 }
 
+completionProbability: {
+  type: Number,
+  default: 0,
+}
+
+
 module.exports = mongoose.model("Task", taskSchema);
