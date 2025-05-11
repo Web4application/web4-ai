@@ -245,3 +245,42 @@ async function addCodeComments(code) {
   const data = await response.json();
   return data.choices[0].message.content.trim();
 }
+
+// Save data to local storage
+function saveToLocal() {
+  const outputData = document.getElementById('output').innerText; // Get current output data
+  localforage.setItem('projectOutput', outputData).then(() => {
+    alert('Data saved to local storage!');
+  }).catch(err => {
+    console.error("Error saving to local storage:", err);
+  });
+}
+
+// Load data from local storage
+function loadFromLocal() {
+  localforage.getItem('projectOutput').then(value => {
+    if (value) {
+      document.getElementById('output').innerText = "Loaded from local storage: " + value;
+    } else {
+      document.getElementById('output').innerText = "No data found in local storage.";
+    }
+  }).catch(err => {
+    console.error("Error loading from local storage:", err);
+  });
+}
+
+// Function to download all project files as a zip
+function downloadAll() {
+  const zip = new JSZip();
+  
+  // Example: Add output content as a file to the zip
+  zip.file("project-output.txt", document.getElementById('output').innerText);
+  
+  // Generate the zip file and create a download link
+  zip.generateAsync({ type: "blob" }).then(function(content) {
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(content);
+    link.download = "project.zip"; // The name of the downloaded file
+    link.click();
+  });
+}
