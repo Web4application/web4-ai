@@ -1,22 +1,32 @@
 const Task = require("../models/Task");
 
-// Create a task
-exports.createTask = async (req, res) => {
+// Get filtered, sorted tasks
+exports.getTasks = async (req, res) => {
+  const { status, priority, sortBy, order } = req.query;
+  let filter = {};
+
+  if (status) filter.status = status;
+  if (priority) filter.priority = priority;
+
+  const sortOrder = order === "desc" ? -1 : 1;
+  const sortField = sortBy ? sortBy : "createdAt";
+
   try {
-    const { title, priority } = req.body;
-    const task = new Task({ title, priority });
-    await task.save();
-    res.status(201).json(task);
+    const tasks = await Task.find(filter).sort({ [sortField]: sortOrder });
+    res.json(tasks);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-// Get all tasks
-exports.getAllTasks = async (req, res) => {
+// Update task priority
+exports.updatePriority = async (req, res) => {
+  const { id } = req.params;
+  const { priority } = req.body;
+
   try {
-    const tasks = await Task.find({});
-    res.json(tasks);
+    const task = await Task.findByIdAndUpdate(id, { priority }, { new: true });
+    res.json(task);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
