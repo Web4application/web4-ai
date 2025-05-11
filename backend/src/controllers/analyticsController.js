@@ -44,3 +44,15 @@ exports.notifyTaskUpdates = async () => {
   const tasks = await Task.find({}).select("title status completionProbability");
   io.emit("taskUpdates", tasks);
 };
+
+const TaskHistory = require('../models/TaskHistory');
+
+exports.getTaskHistory = async (req, res) => {
+  try {
+    const { taskId } = req.query;
+    const history = await TaskHistory.find({ taskId }).sort({ date: 1 });
+    res.json(history);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
