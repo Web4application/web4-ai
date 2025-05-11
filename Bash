@@ -1,4 +1,0 @@
-cd ../frontend
-npx create-react-app . --template typescript
-npm install axios react-router-dom tailwindcss
-npx tailwindcss init
