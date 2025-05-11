@@ -1,0 +1,59 @@
+# Ignore Python bytecode files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+
+# Ignore environment configuration files
+.env
+*.env
+
+# Ignore Flask application instance files
+instance/
+
+# Ignore logs
+*.log
+
+# Ignore virtual environments
+venv/
+env/
+.venv/
+env.bak/
+
+# Ignore node_modules (for React frontend)
+node_modules/
+
+# Ignore build files for React frontend
+build/
+dist/
+
+# Ignore dependency management files for React
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Ignore editor-specific files
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+
+# Ignore coverage reports from testing
+coverage/
+
+# Ignore Docker and other container-related files
+.docker/
+docker-compose.override.yml
+
+# Ignore macOS system files
+.DS_Store
+
+# Ignore Windows system files
+Thumbs.db
+ehthumbs.db
+
+# Ignore generated files and logs from CI/CD pipelines
+*.bak
+*.tmp
+*.swp
