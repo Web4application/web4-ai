@@ -20,50 +20,78 @@ document.getElementById('fileInput').addEventListener('change', (e) => {
 // Function to trigger refactoring of code using either online or offline AI
 async function runAIRefactor() {
   for (let i = 0; i < projectFiles.length; i++) {
-    const refactored = isOnlineAI ? 
-      await realAIRefactor(projectFiles[i].code) : 
-      await localAIRefactor(projectFiles[i].code);
-    projectFiles[i].code = refactored;
-    projectFiles[i].status = 'refactored';
+    try {
+      const refactored = isOnlineAI ? 
+        await realAIRefactor(projectFiles[i].code) : 
+        await localAIRefactor(projectFiles[i].code);
+        
+      projectFiles[i].code = refactored;
+      projectFiles[i].status = 'refactored';
+
+      // Optional: Add more processing like complexity analysis, documentation, etc.
+      await additionalProcessing(projectFiles[i]);
+
+    } catch (error) {
+      console.error(`Error refactoring file ${projectFiles[i].name}:`, error);
+    }
   }
   displayOutput();
 }
 
 // Function for refactoring using OpenAI's GPT model (online)
 async function realAIRefactor(code) {
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': 'AIzaSyAvrxOyAVzPVcnzxuD0mjKVDyS2bNWfC10',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      model: 'gpt-4',
-      messages: [
-        { role: 'system', content: 'You are a senior developer.' },
-        { role: 'user', content: 'Refactor and optimize this code:\\n\\n' + code }
-      ]
-    })
-  });
-  const data = await response.json();
-  return data.choices[0].message.content.trim();
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer YOUR_API_KEY', // Use environment variables to store keys securely
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'gpt-4',
+        messages: [
+          { role: 'system', content: 'You are a senior developer.' },
+          { role: 'user', content: 'Refactor and optimize this code:\\n\\n' + code }
+        ]
+      })
+    });
+    
+    const data = await response.json();
+    return data.choices[0].message.content.trim();
+  } catch (error) {
+    console.error('Error during OpenAI request:', error);
+    throw new Error('Failed to get refactored code from OpenAI');
+  }
 }
 
 // Function for local AI refactoring (offline using WebLLM)
 async function localAIRefactor(code) {
-  const chat = await webllm.createChat();
-  await chat.reload("Llama-3-8B-Instruct"); // Load Llama model
-  const reply = await chat.generate("Refactor and optimize this code:\n" + code);
-  return reply;
+  try {
+    const chat = await webllm.createChat();
+    await chat.reload("Llama-3-8B-Instruct"); // Load Llama model
+    const reply = await chat.generate("Refactor and optimize this code:\n" + code);
+    return reply;
+  } catch (error) {
+    console.error('Error during local AI refactoring:', error);
+    throw new Error('Failed to get refactored code from local AI');
+  }
 }
 
-// Toggle between online and offline AI modes
-function toggleAI() {
-  isOnlineAI = !isOnlineAI;
-  alert(isOnlineAI ? 'Switched to Online AI (GPT)' : 'Switched to Offline AI (WebLLM)');
+// Optional: Additional processing functions like complexity analysis, documentation generation, etc.
+async function additionalProcessing(file) {
+  // Example: Generate documentation for refactored code
+  const doc = await generateDocumentation(file.code);
+  console.log(`Generated documentation for ${file.name}:`, doc);
+  
+  // Example: Generate unit tests for refactored code
+  const tests = await generateUnitTests(file.code);
+  console.log(`Generated unit tests for ${file.name}:`, tests);
+
+  // Update file status to reflect additional processing
+  file.status = 'refactored and documented';
 }
 
-// Display the output of the current project files
+// Function to display the output of the current project files
 function displayOutput() {
   const output = document.getElementById('output');
   output.textContent = projectFiles.map(f => `// ${f.name}\n${f.code}\n`).join('\n\n');
@@ -87,6 +115,8 @@ function downloadProject() {
 function saveToLocal() {
   localforage.setItem('my_project_files', projectFiles).then(() => {
     alert('Saved locally!');
+  }).catch(err => {
+    console.error("Error saving to local storage:", err);
   });
 }
 
@@ -99,63 +129,9 @@ function loadFromLocalStorage() {
     } else {
       alert('No saved project found.');
     }
+  }).catch(err => {
+    console.error("Error loading from local storage:", err);
   });
-}
-
-async function runAIRefactor() {
-  for (let i = 0; i < projectFiles.length; i++) {
-    // Refactor code using AI
-    const refactored = isOnlineAI ? 
-      await realAIRefactor(projectFiles[i].code) : 
-      await localAIRefactor(projectFiles[i].code);
-    
-    // Analyze code complexity
-    const complexityReport = await analyzeCodeComplexity(refactored);
-    console.log(`Complexity report for ${projectFiles[i].name}:`, complexityReport);
-
-    // Generate documentation
-    const documentation = await generateDocumentation(refactored);
-    console.log(`Generated documentation for ${projectFiles[i].name}:`, documentation);
-
-    // Format the code
-    const formattedCode = await formatCode(refactored);
-    console.log(`Formatted code for ${projectFiles[i].name}:`, formattedCode);
-
-    // Generate unit tests
-    const unitTests = await generateUnitTests(refactored);
-    console.log(`Generated unit tests for ${projectFiles[i].name}:`, unitTests);
-
-    // Add comments to code
-    const commentedCode = await addCodeComments(formattedCode);
-    console.log(`Commented code for ${projectFiles[i].name}:`, commentedCode);
-
-    // Update the file with the final version
-    projectFiles[i].code = commentedCode;
-    projectFiles[i].status = 'refactored and commented';
-  }
-  displayOutput();
-}
-
-// Function to analyze code complexity and suggest improvements (AI-powered)
-async function analyzeCodeComplexity(code) {
-  const analysisPrompt = `Analyze the following code and provide a complexity report and suggestions for optimization. Code:\n\n${code}`;
-  
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': 'AIzaSyAvrxOyAVzPVcnzxuD0mjKVDyS2bNWfC10',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      model: 'gpt-4',
-      messages: [
-        { role: 'system', content: 'You are a software engineer specializing in code analysis.' },
-        { role: 'user', content: analysisPrompt }
-      ]
-    })
-  });
-  const data = await response.json();
-  return data.choices[0].message.content.trim();
 }
 
 // Function to generate documentation for code using AI
@@ -165,7 +141,7 @@ async function generateDocumentation(code) {
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
-      'Authorization': 'AIzaSyAvrxOyAVzPVcnzxuD0mjKVDyS2bNWfC10',
+      'Authorization': 'Bearer YOUR_API_KEY', // Use environment variables to store keys securely
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
@@ -180,28 +156,6 @@ async function generateDocumentation(code) {
   return data.choices[0].message.content.trim();
 }
 
-// Function to format code using AI
-async function formatCode(code) {
-  const formatPrompt = `Format the following code to meet standard style conventions:\n\n${code}`;
-  
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': 'AIzaSyAvrxOyAVzPVcnzxuD0mjKVDyS2bNWfC10',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      model: 'gpt-4',
-      messages: [
-        { role: 'system', content: 'You are an expert code formatter.' },
-        { role: 'user', content: formatPrompt }
-      ]
-    })
-  });
-  const data = await response.json();
-  return data.choices[0].message.content.trim();
-}
-
 // Function to generate unit tests for code
 async function generateUnitTests(code) {
   const testPrompt = `Generate unit tests for the following code using the appropriate testing framework (e.g., Jest, Mocha):\n\n${code}`;
@@ -209,7 +163,7 @@ async function generateUnitTests(code) {
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
-      'Authorization': 'AIzaSyAvrxOyAVzPVcnzxuD0mjKVDyS2bNWfC10',
+      'Authorization': 'Bearer YOUR_API_KEY', // Use environment variables to store keys securely
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
@@ -222,65 +176,4 @@ async function generateUnitTests(code) {
   });
   const data = await response.json();
   return data.choices[0].message.content.trim();
-}
-
-// Function to add comments to code
-async function addCodeComments(code) {
-  const commentPrompt = `Add comments to the following code to explain each function, variable, and complex logic:\n\n${code}`;
-  
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': 'AIzaSyAvrxOyAVzPVcnzxuD0mjKVDyS2bNWfC10',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      model: 'gpt-4',
-      messages: [
-        { role: 'system', content: 'You are a code commenting AI.' },
-        { role: 'user', content: commentPrompt }
-      ]
-    })
-  });
-  const data = await response.json();
-  return data.choices[0].message.content.trim();
-}
-
-// Save data to local storage
-function saveToLocal() {
-  const outputData = document.getElementById('output').innerText; // Get current output data
-  localforage.setItem('projectOutput', outputData).then(() => {
-    alert('Data saved to local storage!');
-  }).catch(err => {
-    console.error("Error saving to local storage:", err);
-  });
-}
-
-// Load data from local storage
-function loadFromLocal() {
-  localforage.getItem('projectOutput').then(value => {
-    if (value) {
-      document.getElementById('output').innerText = "Loaded from local storage: " + value;
-    } else {
-      document.getElementById('output').innerText = "No data found in local storage.";
-    }
-  }).catch(err => {
-    console.error("Error loading from local storage:", err);
-  });
-}
-
-// Function to download all project files as a zip
-function downloadAll() {
-  const zip = new JSZip();
-  
-  // Example: Add output content as a file to the zip
-  zip.file("project-output.txt", document.getElementById('output').innerText);
-  
-  // Generate the zip file and create a download link
-  zip.generateAsync({ type: "blob" }).then(function(content) {
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(content);
-    link.download = "project.zip"; // The name of the downloaded file
-    link.click();
-  });
 }
