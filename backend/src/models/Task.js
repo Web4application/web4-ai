@@ -10,4 +10,9 @@ const taskSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
+notificationSent: {
+  type: Boolean,
+  default: false
+}
+
 module.exports = mongoose.model("Task", taskSchema);
