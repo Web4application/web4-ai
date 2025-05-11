@@ -1,19 +1,38 @@
 const Task = require("../models/Task");
 
-exports.getTaskInsights = async (req, res) => {
+exports.calculateCompletionProbability = async () => {
   try {
-    const totalTasks = await Task.countDocuments({});
-    const completedTasks = await Task.countDocuments({ status: "completed" });
-    const pendingTasks = await Task.countDocuments({ status: "pending" });
-    const inProgressTasks = await Task.countDocuments({ status: "in-progress" });
+    const tasks = await Task.find({});
+    const now = new Date();
 
-    res.json({
-      totalTasks,
-      completedTasks,
-      pendingTasks,
-      inProgressTasks,
-      completionRate: (completedTasks / totalTasks) * 100 || 0,
+    const predictions = tasks.map(task => {
+      const dueDate = new Date(task.dueDate);
+      const timeRemaining = (dueDate - now) / (1000 * 60 * 60 * 24); // Days remaining
+      let probability = 0;
+
+      if (task.status === "completed") {
+        probability = 100;
+      } else if (timeRemaining <= 0) {
+        probability = 0;
+      } else {
+        const progress = task.progress || 0;
+        probability = Math.min(100, progress + timeRemaining * 10);
+      }
+
+      task.completionProbability = probability;
+      return task.save();
     });
+
+    await Promise.all(predictions);
+  } catch (error) {
+    console.error("Error calculating completion probability:", error);
+  }
+};
+
+exports.getTaskForecasts = async (req, res) => {
+  try {
+    const tasks = await Task.find({}).select("title completionProbability dueDate");
+    res.json(tasks);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
