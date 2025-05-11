@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Dashboard from "./components/Dashboard";
-import NotificationManager from "./components/NotificationManager";
 import AIInteraction from "./components/AIInteraction";
+import NotificationManager from "./components/NotificationManager";
 
 function App() {
   return (
