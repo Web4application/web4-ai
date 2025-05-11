@@ -66,3 +66,21 @@ exports.analyzeTaskById = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+const TaskHistory = require('../models/TaskHistory');
+const Task = require('../models/Task');
+
+exports.updateTaskProgress = async (taskId, progress) => {
+  try {
+    const task = await Task.findById(taskId);
+    if (task) {
+      task.progress = progress;
+      await task.save();
+
+      const history = new TaskHistory({ taskId, progress });
+      await history.save();
+    }
+  } catch (error) {
+    console.error('Error updating task progress:', error);
+  }
+};
