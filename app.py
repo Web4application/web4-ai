@@ -45,5 +45,9 @@ Provide only the code for the component, and ensure that it is optimized for per
     # Return the generated code
     return jsonify({"generated_code": response})
 
-if __name__ == '__main__':
-    app.run(debug=True)
+@app.route('/')
+def index():
+    return jsonify({"message": "Web4AI is running successfully!"})
+
+if __name__ == "__main__":
+    app.run()
