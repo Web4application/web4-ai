@@ -1,3 +1,4 @@
+pip install -r requirements.txt
 Flask==2.2.5
 Flask-Cors==6.0.0
 Flask-SQLAlchemy==3.0.0
