@@ -1,10 +1,7 @@
-pip install -r requirements.txt
-while read -r module; do
-    npm install "$module"
-done < components.txt
-python3 -m venv env
-source env/bin/activate
+# Remove existing virtual environment if necessary
+rm -rf env/
 python -m venv env
-.\env\Scripts\activate
-pip show Flask-Cors
+source env/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
 
