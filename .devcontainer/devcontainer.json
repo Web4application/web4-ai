@@ -1,0 +1,26 @@
+{
+  "name": "Web4AI Codespace",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/bash",
+    "python.defaultInterpreterPath": "/usr/local/bin/python3",
+    "python.linting.enabled": true,
+    "python.formatting.autopep8Path": "/usr/local/bin/autopep8",
+    "python.formatting.provider": "autopep8"
+  },
+  "extensions": [
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "streetsidesoftware.code-spell-checker"
+  ],
+  "forwardPorts": [5000, 3000],
+  "postCreateCommand": "/usr/local/bin/install.sh",
+  "remoteEnv": {
+    "OPENAI_API_KEY": "${env:OPENAI_API_KEY}"
+  }
+}
