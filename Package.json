@@ -1,5 +1,5 @@
 {
-  "name": "web4ai-project-assistant",
+  "name": "web4ai",
   "version": "1.0.0",
   "description": "AI-powered assistant for developers to help with code refactoring and file management.",
   "main": "src/index.js",
@@ -20,7 +20,9 @@
     "node": ">=14.0.0",
     "npm": ">=6.0.0"
   },
-  "author": "Your Name",
+  "author": "seeiki yakub",
   "license": "MIT",
-  "homepage": "https://web4application.github.io/Web4AI_Project_Assistant/"
+  "homepage": "https://web4application.github.io/Web4AI"
 }
+"predeploy": "npm run build",
+"deploy": "gh-pages -d build"
