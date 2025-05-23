@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AI Refactor</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; }
+    button { margin: 0.5rem; padding: 0.6rem 1.2rem; font-weight: bold; cursor: pointer; }
+    #taskStatus { margin-bottom: 1rem; font-weight: bold; }
+    textarea { width: 100%; max-width: 700px; font-family: monospace; font-size: 14px; }
+  </style>
+  <script src="https://mlc.ai/web-llm/dist/index.js"></script>
+</head>
+<body>
+
+<h1>AI Refactor</h1>
+<div id="taskStatus">Waiting to run refactor...</div>
+<textarea id="inputCode" rows="10" placeholder="Paste your code here to refactor..."></textarea><br>
+
+<button onclick="runRefactor()">Run Refactor</button>
+<button onclick="saveResult()">Save</button>
+<button onclick="redo()">Redo</button>
+<button onclick="goBack()">Back</button>
+
+<script>
+  let model, lastResult = '';
+
+  async function loadModel() {
+    document.getElementById('taskStatus').textContent = 'Loading model...';
+    model = await mlc.llm.load({
+      model: "llama2-7b-chat.ggmlv3.q4_0.bin",
+      verbose: true
+    });
+    document.getElementById('taskStatus').textContent = 'Model loaded! Ready to refactor.';
+  }
+
+  async function runRefactor() {
+    const code = document.getElementById('inputCode').value.trim();
+    if (!code) {
+      alert('Please enter some code to refactor.');
+      return;
+    }
+    if (!model) {
+      alert('Model not loaded yet. Loading now...');
+      await loadModel();
+    }
+
+    document.getElementById('taskStatus').textContent = 'Refactoring in progress...';
+
+    const prompt = `Refactor this code for readability and efficiency:\n\n${code}\n\nRefactored code:`;
+
+    try {
+      const output = await model.generate(prompt, {
+        max_new_tokens: 200,
+        temperature: 0.7
+      });
+
+      lastResult = output.text.trim();
+      document.getElementById('taskStatus').textContent = 'Refactor complete! Review changes below.';
+      document.getElementById('inputCode').value = lastResult;
+    } catch (error) {
+      document.getElementById('taskStatus').textContent = 'Error during refactor.';
+      console.error(error);
+    }
+  }
+
+  function saveResult() {
+    if (!lastResult) {
+      alert('No refactor results to save yet.');
+      return;
+    }
+    const key = `refactor_${Date.now()}`;
+    localStorage.setItem(key, lastResult);
+    alert(`Saved refactor result as "${key}".`);
+  }
+
+  function redo() {
+    if (!lastResult) {
+      alert('No previous refactor to redo. Run refactor first.');
+      return;
+    }
+    document.getElementById('inputCode').value = lastResult;
+    runRefactor();
+  }
+
+  function goBack() {
+    window.location.href = 'index.html';
+  }
+
+  loadModel().catch(err => {
+    document.getElementById('taskStatus').textContent = 'Failed to load model.';
+    console.error(err);
+  });
+</script>
+
+</body>
+</html>
