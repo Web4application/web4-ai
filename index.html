@@ -4,139 +4,139 @@
   <meta charset="UTF-8" />
   <title>Web4 AI Project Assistant</title>
   <style>
-    /* Sidebar styling */
+    /* Discord-style theme */
+    body {
+      background-color: #36393f;
+      color: #dcddde;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0; padding: 0;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
     #sidebar {
-      width: 80px;
       background-color: #2f3136;
+      width: 220px;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      padding-top: 10px;
-      gap: 12px;
-      border-right: 1px solid #202225;
-      height: 100vh;
-      position: fixed;
-      top: 0;
-      left: 0;
+      padding: 1rem;
+      box-sizing: border-box;
+    }
+    #sidebar h2 {
+      margin: 0 0 1rem 0;
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: #ffffff;
       user-select: none;
     }
-
-    .nav-btn {
-      width: 50px;
-      height: 50px;
+    .button {
       background-color: #5865f2;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
+      border-radius: 8px;
       color: white;
-      font-weight: bold;
-      font-size: 11px;
+      padding: 10px 15px;
+      margin-bottom: 8px;
+      font-weight: 600;
+      cursor: pointer;
       text-align: center;
-      transition: background-color 0.3s ease;
-      position: relative;
+      text-decoration: none;
+      user-select: none;
+      transition: background-color 0.2s ease;
+      display: block;
     }
-    .nav-btn:hover {
+    .button:hover {
       background-color: #4752c4;
     }
-
-    /* Tooltip styling */
-    .nav-btn[title]:hover::after {
-      content: attr(title);
-      position: absolute;
-      left: 90px;
-      background: #111;
-      color: white;
-      padding: 5px 8px;
-      border-radius: 5px;
-      white-space: nowrap;
-      font-size: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      pointer-events: none;
-      opacity: 0.9;
-      z-index: 1000;
-    }
-
-    /* Main content area */
-    #content {
-      margin-left: 80px; /* same as sidebar width */
-      padding: 20px;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f5f6f7;
-      height: 100vh;
+    #mainContent {
+      flex-grow: 1;
+      background-color: #40444b;
+      padding: 2rem;
+      box-sizing: border-box;
       overflow-y: auto;
     }
-
-    /* File loader styles */
-    #fileManagement {
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      max-width: 600px;
-      box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+    #fileInput {
+      display: block;
+      margin-bottom: 1rem;
+      color: #dcddde;
     }
-    #fileManagement input[type="file"] {
-      width: 100%;
-      margin-bottom: 10px;
-    }
-    #fileManagement button {
-      background-color: #5865f2;
+    #modelSelector {
+      margin-top: 1rem;
+      background-color: #2f3136;
       border: none;
-      padding: 10px 15px;
-      color: white;
+      color: #dcddde;
+      padding: 8px;
       border-radius: 6px;
+      font-size: 1rem;
+      width: 100%;
+      box-sizing: border-box;
       cursor: pointer;
-      font-weight: bold;
-      margin-right: 10px;
-      transition: background-color 0.3s ease;
     }
-    #fileManagement button:hover {
-      background-color: #4752c4;
+    label {
+      display: block;
+      margin-bottom: 0.3rem;
+      user-select: none;
     }
   </style>
 </head>
 <body>
 
   <nav id="sidebar">
-    <div class="nav-btn" onclick="navigateTo('refactor.html')" title="Run AI Refactor">Refactor</div>
-    <div class="nav-btn" onclick="navigateTo('analyze.html')" title="Analyze Code">Analyze</div>
-    <div class="nav-btn" onclick="navigateTo('docgen.html')" title="Generate Documentation">Docs</div>
-    <div class="nav-btn" onclick="navigateTo('format.html')" title="Format Code">Format</div>
-    <div class="nav-btn" onclick="navigateTo('unittests.html')" title="Generate Unit Tests">Tests</div>
-    <div class="nav-btn" onclick="navigateTo('commenting.html')" title="Add Code Comments">Comments</div>
+    <h2>Web4 AI Tools</h2>
+    <a href="refactor.html" class="button">AI Refactor</a>
+    <a href="analyze.html" class="button">Analyze Code</a>
+    <a href="docgen.html" class="button">Generate Docs</a>
+    <a href="format.html" class="button">Format Code</a>
+    <a href="unittests.html" class="button">Generate Unit Tests</a>
+    <a href="commenting.html" class="button">Add Comments</a>
+    
+    <label for="modelSelector">Select AI Model</label>
+    <select id="modelSelector">
+      <option value="llama2-7b-chat.ggmlv3.q4_0.bin">LLaMA 2 7B Chat</option>
+      <option value="gpt4all-lora.bin">GPT4All LoRA</option>
+      <option value="wizard-vicuna-13b.bin">Wizard Vicuna 13B</option>
+      <option value="ggml-alpaca-7b-q4.bin">Alpaca 7B Q4</option>
+    </select>
   </nav>
 
-  <main id="content">
-    <section id="fileManagement">
-      <h2>File Management</h2>
-      <input type="file" id="fileInput" multiple />
-      <button onclick="loadFiles()">Load Files</button>
-      <button onclick="downloadAll()">Download Project</button>
-    </section>
+  <main id="mainContent">
+    <h1>Welcome to Web4 AI Project Assistant</h1>
+    <p>Load your files below. Then navigate to any AI tool from the left sidebar.</p>
+
+    <input type="file" id="fileInput" multiple webkitdirectory directory />
+    <button class="button" onclick="loadFiles()">Load Files</button>
+
+    <h3>Loaded Files:</h3>
+    <ul id="fileList" style="max-height: 300px; overflow-y: auto; background: #2f3136; padding: 10px; border-radius: 8px;"></ul>
   </main>
 
   <script>
-    function navigateTo(page) {
-      window.location.href = page;
-    }
+    const fileInput = document.getElementById('fileInput');
+    const fileList = document.getElementById('fileList');
+    let loadedFiles = [];
 
     function loadFiles() {
-      const input = document.getElementById('fileInput');
-      if (!input.files.length) {
-        alert('Please select files to load.');
+      loadedFiles = Array.from(fileInput.files);
+      fileList.innerHTML = '';
+      if (loadedFiles.length === 0) {
+        fileList.innerHTML = '<li>No files loaded.</li>';
         return;
       }
-      alert(`${input.files.length} file(s) loaded — implement your logic here.`);
-      // TODO: add your file handling logic here (e.g., localForage storage)
+      loadedFiles.forEach(file => {
+        const li = document.createElement('li');
+        li.textContent = file.webkitRelativePath || file.name;
+        fileList.appendChild(li);
+      });
+      alert(`${loadedFiles.length} files loaded successfully!`);
     }
 
-    function downloadAll() {
-      alert('Downloading all project files — implement your logic here.');
-      // TODO: add your project zipping and downloading logic here (e.g., JSZip)
-    }
+    // Save the selected model globally for other pages via localStorage
+    const modelSelector = document.getElementById('modelSelector');
+    modelSelector.value = localStorage.getItem('selectedModel') || modelSelector.value;
+
+    modelSelector.addEventListener('change', () => {
+      localStorage.setItem('selectedModel', modelSelector.value);
+      alert(`AI Model set to: ${modelSelector.options[modelSelector.selectedIndex].text}`);
+    });
   </script>
-
+  
 </body>
 </html>
