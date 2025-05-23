@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Format Code</title>
+  <script src="https://mlc.ai/web-llm/dist/index.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; }
+    textarea, button { margin: 10px 0; width: 100%; max-width: 700px; }
+    button { padding: 10px; font-weight: bold; }
+  </style>
+</head>
+<body>
+<h1>Formatter</h1>
+<div id="taskStatus">Idle...</div>
+<textarea id="inputCode" rows="12" placeholder="Paste code to format..."></textarea>
+<br>
+<button onclick="runTask()">Format Code</button>
+<button onclick="saveResult()">Save</button>
+<button onclick="goBack()">Back</button>
+
+<script>
+  let model, lastResult = '';
+
+  async function loadModel() {
+    document.getElementById('taskStatus').textContent = 'Loading model...';
+    model = await mlc.llm.load({ model: "llama2-7b-chat.ggmlv3.q4_0.bin", verbose: true });
+    document.getElementById('taskStatus').textContent = 'Ready to format.';
+  }
+
+  async function runTask() {
+    const code = document.getElementById('inputCode').value.trim();
+    if (!code) return alert('Paste code first.');
+    const prompt = `Format this code with proper indentation and styling:\n\n${code}`;
+    const output = await model.generate(prompt, { max_new_tokens: 300 });
+    lastResult = output.text.trim();
+    document.getElementById('inputCode').value = lastResult;
+    document.getElementById('taskStatus').textContent = 'Formatted!';
+  }
+
+  function saveResult() {
+    localStorage.setItem(`format_${Date.now()}`, lastResult);
+    alert('Saved.');
+  }
+
+  function goBack() {
+    window.location.href = 'index.html';
+  }
+
+  loadModel();
+</script>
+</body>
+</html>
