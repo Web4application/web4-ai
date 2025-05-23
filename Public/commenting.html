@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>AI Code Analyzer</title>
+  <title>AI Comment Generator</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 2rem; background-color: #2f3136; color: #dcddde; }
     h1 { color: #ffffff; }
@@ -17,11 +17,11 @@
 </head>
 <body>
 
-<h1>AI Code Analyzer</h1>
-<div id="taskStatus">Waiting to run analyze code...</div>
-<textarea id="inputCode" placeholder="Paste your code here to analyze code..."></textarea><br>
+<h1>AI Comment Generator</h1>
+<div id="taskStatus">Waiting to run add code comments...</div>
+<textarea id="inputCode" placeholder="Paste your code here to add code comments..."></textarea><br>
 
-<button onclick="runTask()">Run Analyze</button>
+<button onclick="runTask()">Run Add Comments</button>
 <button onclick="saveResult()">Save</button>
 <button onclick="redo()">Redo</button>
 <button onclick="goBack()">Back</button>
@@ -35,7 +35,7 @@
       model: "llama2-7b-chat.ggmlv3.q4_0.bin",
       verbose: true
     });
-    document.getElementById('taskStatus').textContent = 'Model loaded! Ready to analyze code.';
+    document.getElementById('taskStatus').textContent = 'Model loaded! Ready to add code comments.';
   }
 
   async function runTask() {
@@ -49,14 +49,14 @@
       await loadModel();
     }
 
-    document.getElementById('taskStatus').textContent = 'analyze code in progress...';
-    const prompt = `Analyze this code and summarize the logic, potential issues, and suggest improvements:\n\n${code}\n\nAnalysis:`;
+    document.getElementById('taskStatus').textContent = 'add code comments in progress...';
+    const prompt = `Add explanatory comments to the following code for clarity and maintenance:\n\n${code}\n\nCommented Code:`;
     const output = await model.generate(prompt, {
       max_new_tokens: 200,
       temperature: 0.7
     });
     lastResult = output.text.trim();
-    document.getElementById('taskStatus').textContent = 'analyze code complete! Review result below.';
+    document.getElementById('taskStatus').textContent = 'add code comments complete! Review result below.';
     document.getElementById('inputCode').value = lastResult;
   }
 
@@ -65,7 +65,7 @@
       alert('No results to save.');
       return;
     }
-    const key = generateFilename('analyze');
+    const key = generateFilename('comments');
     localStorage.setItem(key, lastResult);
     alert(`Saved result as "${key}".`);
   }
