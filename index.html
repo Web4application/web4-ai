@@ -1,111 +1,140 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Web4 AI Project Assistant</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-  <script src="https://unpkg.com/localforage/dist/localforage.min.js"></script>
-  <script src="https://mlc.ai/web-llm/dist/index.js"></script>
+  <style>
+    /* Sidebar styling */
+    #sidebar {
+      width: 80px;
+      background-color: #2f3136;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 10px;
+      gap: 12px;
+      border-right: 1px solid #202225;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      user-select: none;
+    }
+
+    .nav-btn {
+      width: 50px;
+      height: 50px;
+      background-color: #5865f2;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: white;
+      font-weight: bold;
+      font-size: 11px;
+      text-align: center;
+      transition: background-color 0.3s ease;
+    }
+    .nav-btn:hover {
+      background-color: #4752c4;
+    }
+
+    /* Tooltip styling */
+    .nav-btn[title]:hover::after {
+      content: attr(title);
+      position: absolute;
+      left: 90px;
+      background: #111;
+      color: white;
+      padding: 5px 8px;
+      border-radius: 5px;
+      white-space: nowrap;
+      font-size: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      opacity: 0.9;
+      z-index: 1000;
+    }
+
+    /* Main content area */
+    #content {
+      margin-left: 80px; /* same as sidebar width */
+      padding: 20px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* File loader styles */
+    #fileManagement {
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 600px;
+      box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+    }
+    #fileManagement input[type="file"] {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    #fileManagement button {
+      background-color: #5865f2;
+      border: none;
+      padding: 10px 15px;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-right: 10px;
+      transition: background-color 0.3s ease;
+    }
+    #fileManagement button:hover {
+      background-color: #4752c4;
+    }
+  </style>
 </head>
 <body>
 
-  <header>
-    <h1>Web4 AI Project Assistant</h1>
-  </header>
+  <nav id="sidebar">
+    <div class="nav-btn" onclick="navigateTo('refactor.html')" title="Run AI Refactor">Refactor</div>
+    <div class="nav-btn" onclick="navigateTo('analyze.html')" title="Analyze Code">Analyze</div>
+    <div class="nav-btn" onclick="navigateTo('docgen.html')" title="Generate Documentation">Docs</div>
+    <div class="nav-btn" onclick="navigateTo('format.html')" title="Format Code">Format</div>
+    <div class="nav-btn" onclick="navigateTo('unittests.html')" title="Generate Unit Tests">Tests</div>
+    <div class="nav-btn" onclick="navigateTo('commenting.html')" title="Add Code Comments">Comments</div>
+  </nav>
 
-  <!-- File Management Section -->
-  <section id="fileManagement">
-    <h2>File Management</h2>
-    <input type="file" id="fileInput" multiple />
-    <button onclick="loadFiles()">Load Files</button>
-    <button onclick="downloadAll()">Download Project</button>
-  </section>
+  <main id="content">
+    <section id="fileManagement">
+      <h2>File Management</h2>
+      <input type="file" id="fileInput" multiple />
+      <button onclick="loadFiles()">Load Files</button>
+      <button onclick="downloadAll()">Download Project</button>
+    </section>
+  </main>
 
-  <hr>
+  <script>
+    function navigateTo(page) {
+      // Opens the page in the same tab — you can change to window.open(page, '_blank') for new tab
+      window.location.href = page;
+    }
 
-  <!-- AI Operations Section -->
-  <section id="aiOperations">
-    <h2>AI Options</h2>
-    <label>
-      <input type="checkbox" id="toggleOnlineAI" checked> Use Online GPT-4
-    </label>
-    <div>
-      <button onclick="runAIRefactor()">Run AI Refactor</button>
-      <button onclick="runAnalysis()">Analyze Code</button>
-      <button onclick="runDocGen()">Generate Documentation</button>
-      <button onclick="runFormat()">Format Code</button>
-      <button onclick="runUnitTests()">Generate Unit Tests</button>
-      <button onclick="runCommenting()">Add Code Comments</button>
-    </div>
-  </section>
+    function loadFiles() {
+      const input = document.getElementById('fileInput');
+      if (!input.files.length) {
+        alert('Please select files to load.');
+        return;
+      }
+      // Example placeholder for loading files
+      alert(`${input.files.length} file(s) loaded — implement your logic here.`);
+      // You’d parse and store the files here for AI processing later
+    }
 
-  <hr>
+    function downloadAll() {
+      alert('Downloading all project files — implement your logic here.');
+      // Use JSZip or similar for zipping and downloading
+    }
+  </script>
 
-  <!-- Local Storage Section -->
-  <section id="localStorage">
-    <h2>Local Storage</h2>
-    <button onclick="saveToLocal()">Save to Local Storage</button>
-    <button onclick="loadFromLocal()">Load from Local Storage</button>
-  </section>
-
-  <hr>
-  <!-- Output Section -->
-  <section id="outputSection">
-    <div id="output"></div>
-  </section>
-
-  <script src="assistance.js"></script>
 </body>
 </html>
-
-<div style="background-color: #2f3136; padding: 20px; border-radius: 10px; color: #dcddde; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
-  <h1 style="color: #ffffff;">AI Text Analysis</h1>
-  <p>Enter your message and let the AI decode the vibes.</p>
-
-  <form id="analyze-form">
-    <textarea id="text" placeholder="Type something insightful..." 
-              style="width: 100%; height: 150px; padding: 12px; background-color: #40444b; border: none; border-radius: 8px; color: #dcddde; font-size: 14px;"></textarea><br>
-    <button type="submit" 
-            style="margin-top: 10px; padding: 10px 20px; background-color: #5865f2; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
-      Analyze
-    </button>
-  </form>
-
-  <div id="result" style="display:none; margin-top: 20px; background-color: #36393f; padding: 15px; border-radius: 8px;">
-    <h2 style="color: #ffffff;">Analysis Result:</h2>
-    <p id="analysis" style="color: #dcddde;"></p>
-  </div>
-</div>
-
-<script>
-  document.getElementById('analyze-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const text = document.getElementById('text').value.trim();
-    if (!text) {
-      alert('Please enter some text.');
-      return;
-    }
-
-    try {
-      const response = await fetch('http://localhost:3000/api/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text })
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        document.getElementById('result').style.display = 'block';
-        document.getElementById('analysis').textContent = data.analysis;
-      } else {
-        alert('AI failed to analyze your text. Try again.');
-      }
-    } catch (err) {
-      console.error(err);
-      alert('Something went wrong with the server.');
-    }
-  });
-</script>
