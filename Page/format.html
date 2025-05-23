@@ -4,24 +4,44 @@
   <meta charset="UTF-8" />
   <title>Format Code - Web4 AI</title>
   <style>
+    /* Consistent styling */
     body {
       background-color: #36393f;
       color: #dcddde;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0; padding: 2rem;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
+      margin: 2rem;
+      user-select: none;
     }
     header {
       font-weight: 700;
       font-size: 1.8rem;
       margin-bottom: 1rem;
-      user-select: none;
+    }
+    nav a {
+      color: #dcddde;
+      text-decoration: none;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      display: inline-block;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+    select {
+      background-color: #2f3136;
+      border: none;
+      color: #dcddde;
+      padding: 8px;
+      border-radius: 6px;
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+      width: 100%;
+      max-width: 300px;
+      cursor: pointer;
     }
     textarea {
       width: 100%;
-      height: 250px;
+      height: 280px;
       background-color: #2f3136;
       border: none;
       border-radius: 8px;
@@ -52,29 +72,6 @@
     button:hover {
       background-color: #4752c4;
     }
-    #modelSelector {
-      background-color: #2f3136;
-      border: none;
-      color: #dcddde;
-      padding: 8px;
-      border-radius: 6px;
-      font-size: 1rem;
-      margin-bottom: 1.5rem;
-      width: 100%;
-      max-width: 300px;
-      cursor: pointer;
-      user-select: none;
-    }
-    nav a {
-      color: #dcddde;
-      text-decoration: none;
-      font-weight: 600;
-      margin-right: 1rem;
-      user-select: none;
-    }
-    nav a:hover {
-      text-decoration: underline;
-    }
   </style>
   <script src="https://mlc.ai/web-llm/dist/index.js"></script>
 </head>
@@ -82,9 +79,7 @@
 
 <header>Format Code</header>
 
-<nav>
-  <a href="index.html">← Back to Home</a>
-</nav>
+<nav><a href="index.html">← Back to Home</a></nav>
 
 <label for="modelSelector">Select AI Model</label>
 <select id="modelSelector">
@@ -94,13 +89,12 @@
   <option value="ggml-alpaca-7b-q4.bin">Alpaca 7B Q4</option>
 </select>
 
-<div id="taskStatus">Waiting to format code...</div>
+<div id="taskStatus">Waiting for input to format...</div>
 <textarea id="inputCode" placeholder="Paste your code here to format..."></textarea>
 
 <div>
   <button onclick="runFormat()">Format Code</button>
   <button onclick="saveResult()">Save Result</button>
-  <button onclick="redo()">Redo</button>
 </div>
 
 <script>
@@ -139,15 +133,15 @@
 
     document.getElementById('taskStatus').textContent = 'Formatting code...';
 
-    const prompt = `Format this code with proper indentation, line breaks, and styling:\n\n${code}\n\nFormatted code:`;
+    const prompt = `Format this code with consistent style, indentation, and clarity:\n\n${code}\n\nFormatted code:`;
 
     try {
       const output = await model.generate(prompt, {
-        max_new_tokens: 300,
-        temperature: 0.6
+        max_new_tokens: 200,
+        temperature: 0.4
       });
       lastResult = output.text.trim();
-      document.getElementById('taskStatus').textContent = 'Code formatting complete! Review below.';
+      document.getElementById('taskStatus').textContent = 'Code formatted! Review results below.';
       document.getElementById('inputCode').value = lastResult;
     } catch (err) {
       document.getElementById('taskStatus').textContent = 'Code formatting failed.';
@@ -157,7 +151,7 @@
 
   function saveResult() {
     if (!lastResult) {
-      alert('No formatting results to save yet.');
+      alert('No formatted code to save yet.');
       return;
     }
     const blob = new Blob([lastResult], { type: 'text/plain' });
@@ -170,15 +164,6 @@
     a.remove();
     URL.revokeObjectURL(url);
     alert('Formatted code saved as text file.');
-  }
-
-  function redo() {
-    if (!lastResult) {
-      alert('No previous formatting to redo. Format code first.');
-      return;
-    }
-    document.getElementById('inputCode').value = lastResult;
-    runFormat();
   }
 
   loadModel().catch(err => {
