@@ -2,75 +2,73 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Format Code - Web4 AI</title>
+  <title>Format Code - Web4 AI Project Assistant</title>
   <style>
-    /* Consistent styling */
     body {
       background-color: #36393f;
       color: #dcddde;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 2rem;
-      user-select: none;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
     }
     header {
-      font-weight: 700;
-      font-size: 1.8rem;
-      margin-bottom: 1rem;
-    }
-    nav a {
-      color: #dcddde;
-      text-decoration: none;
-      font-weight: 600;
-      margin-bottom: 1.5rem;
-      display: inline-block;
-    }
-    nav a:hover {
-      text-decoration: underline;
-    }
-    select {
-      background-color: #2f3136;
-      border: none;
-      color: #dcddde;
-      padding: 8px;
-      border-radius: 6px;
-      font-size: 1rem;
-      margin-bottom: 1.5rem;
-      width: 100%;
-      max-width: 300px;
-      cursor: pointer;
+      font-size: 2rem;
+      margin-bottom: 20px;
+      font-weight: bold;
     }
     textarea {
-      width: 100%;
-      height: 280px;
+      width: 90%;
+      max-width: 900px;
+      height: 250px;
       background-color: #2f3136;
       border: none;
       border-radius: 8px;
       color: #dcddde;
-      padding: 1rem;
+      padding: 15px;
       font-family: monospace;
       font-size: 1rem;
       resize: vertical;
-      margin-bottom: 1rem;
+      margin-bottom: 20px;
     }
-    #taskStatus {
-      margin-bottom: 1rem;
-      font-weight: 600;
-      min-height: 24px;
+    select {
+      background-color: #2f3136;
+      color: #dcddde;
+      border: none;
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 20px;
+      font-weight: bold;
+      cursor: pointer;
+      max-width: 900px;
+      width: 90%;
     }
     button {
       background-color: #5865f2;
       border: none;
-      border-radius: 8px;
+      border-radius: 6px;
       color: white;
-      font-weight: 600;
+      padding: 12px 25px;
+      font-weight: bold;
       cursor: pointer;
-      padding: 10px 20px;
-      margin-right: 10px;
-      user-select: none;
+      margin: 5px;
       transition: background-color 0.2s ease;
+      font-size: 1rem;
     }
     button:hover {
       background-color: #4752c4;
+    }
+    #status {
+      margin-top: 15px;
+      font-style: italic;
+      max-width: 900px;
+      width: 90%;
+    }
+    .btn-group {
+      margin-bottom: 15px;
     }
   </style>
   <script src="https://mlc.ai/web-llm/dist/index.js"></script>
@@ -79,45 +77,32 @@
 
 <header>Format Code</header>
 
-<nav><a href="index.html">← Back to Home</a></nav>
-
-<label for="modelSelector">Select AI Model</label>
-<select id="modelSelector">
+<select id="modelSelector" aria-label="Select AI Model">
   <option value="llama2-7b-chat.ggmlv3.q4_0.bin">LLaMA 2 7B Chat</option>
-  <option value="gpt4all-lora.bin">GPT4All LoRA</option>
-  <option value="wizard-vicuna-13b.bin">Wizard Vicuna 13B</option>
-  <option value="ggml-alpaca-7b-q4.bin">Alpaca 7B Q4</option>
+  <option value="vicuna-13b-1.1-q4_2.bin">Vicuna 13B</option>
+  <option value="falcon-7b.bin">Falcon 7B</option>
 </select>
 
-<div id="taskStatus">Waiting for input to format...</div>
 <textarea id="inputCode" placeholder="Paste your code here to format..."></textarea>
 
-<div>
+<div class="btn-group">
   <button onclick="runFormat()">Format Code</button>
-  <button onclick="saveResult()">Save Result</button>
+  <button onclick="saveResult()">Save</button>
+  <button onclick="redo()">Redo</button>
+  <button onclick="goBack()">Back</button>
 </div>
 
+<div id="status">Waiting to format code...</div>
+
 <script>
-  let model, lastResult = '';
-
-  const modelSelector = document.getElementById('modelSelector');
-  modelSelector.value = localStorage.getItem('selectedModel') || modelSelector.value;
-
-  modelSelector.addEventListener('change', () => {
-    localStorage.setItem('selectedModel', modelSelector.value);
-    alert(`AI Model set to: ${modelSelector.options[modelSelector.selectedIndex].text}`);
-    if (model) {
-      loadModel();
-    }
-  });
+  let model;
+  let lastResult = '';
 
   async function loadModel() {
-    document.getElementById('taskStatus').textContent = 'Loading model...';
-    model = await mlc.llm.load({
-      model: modelSelector.value,
-      verbose: true
-    });
-    document.getElementById('taskStatus').textContent = 'Model loaded! Ready to format code.';
+    const selectedModel = document.getElementById('modelSelector').value;
+    document.getElementById('status').textContent = `Loading model: ${selectedModel} ...`;
+    model = await mlc.llm.load({ model: selectedModel, verbose: true });
+    document.getElementById('status').textContent = 'Model loaded! Ready to format code.';
   }
 
   async function runFormat() {
@@ -130,22 +115,20 @@
       alert('Model not loaded yet. Loading now...');
       await loadModel();
     }
-
-    document.getElementById('taskStatus').textContent = 'Formatting code...';
-
-    const prompt = `Format this code with consistent style, indentation, and clarity:\n\n${code}\n\nFormatted code:`;
+    document.getElementById('status').textContent = 'Formatting code...';
+    const prompt = `Format the following code properly with consistent indentation and style:\n\n${code}\n\nFormatted code:`;
 
     try {
       const output = await model.generate(prompt, {
-        max_new_tokens: 200,
-        temperature: 0.4
+        max_new_tokens: 250,
+        temperature: 0.7
       });
       lastResult = output.text.trim();
-      document.getElementById('taskStatus').textContent = 'Code formatted! Review results below.';
       document.getElementById('inputCode').value = lastResult;
-    } catch (err) {
-      document.getElementById('taskStatus').textContent = 'Code formatting failed.';
-      console.error(err);
+      document.getElementById('status').textContent = 'Formatting complete! Review results below.';
+    } catch (e) {
+      console.error(e);
+      document.getElementById('status').textContent = 'Error during code formatting.';
     }
   }
 
@@ -154,21 +137,32 @@
       alert('No formatted code to save yet.');
       return;
     }
-    const blob = new Blob([lastResult], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `formatted_code_${Date.now()}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-    alert('Formatted code saved as text file.');
+    const key = `format_${Date.now()}`;
+    localStorage.setItem(key, lastResult);
+    alert(`Saved formatted code as "${key}".`);
+  }
+
+  function redo() {
+    if (!lastResult) {
+      alert('No previous formatted code to redo. Run format first.');
+      return;
+    }
+    document.getElementById('inputCode').value = lastResult;
+    runFormat();
+  }
+
+  function goBack() {
+    window.location.href = 'index.html';
   }
 
   loadModel().catch(err => {
-    document.getElementById('taskStatus').textContent = 'Failed to load model.';
+    document.getElementById('status').textContent = 'Failed to load model.';
     console.error(err);
+  });
+
+  document.getElementById('modelSelector').addEventListener('change', () => {
+    model = null;
+    document.getElementById('status').textContent = 'Model changed. Reload to activate.';
   });
 </script>
 
