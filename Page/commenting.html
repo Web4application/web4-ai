@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Add Code Comments - Web4 AI Project Assistant</title>
+  <title>Add Comments to Code - Web4 AI Project Assistant</title>
   <style>
     body {
       background-color: #36393f;
@@ -16,44 +16,47 @@
       min-height: 100vh;
     }
     header {
-      font-size: 1.8rem;
+      font-size: 2rem;
       margin-bottom: 20px;
       font-weight: bold;
     }
     textarea {
       width: 90%;
-      max-width: 800px;
-      height: 200px;
+      max-width: 900px;
+      height: 250px;
       background-color: #2f3136;
       border: none;
       border-radius: 8px;
       color: #dcddde;
-      padding: 12px;
+      padding: 15px;
       font-family: monospace;
       font-size: 1rem;
       resize: vertical;
-      margin-bottom: 15px;
+      margin-bottom: 20px;
     }
     select {
       background-color: #2f3136;
       color: #dcddde;
       border: none;
       border-radius: 6px;
-      padding: 8px;
-      margin-bottom: 15px;
+      padding: 10px;
+      margin-bottom: 20px;
       font-weight: bold;
       cursor: pointer;
+      max-width: 900px;
+      width: 90%;
     }
     button {
       background-color: #5865f2;
       border: none;
       border-radius: 6px;
       color: white;
-      padding: 10px 20px;
+      padding: 12px 25px;
       font-weight: bold;
       cursor: pointer;
-      margin-right: 10px;
+      margin: 5px;
       transition: background-color 0.2s ease;
+      font-size: 1rem;
     }
     button:hover {
       background-color: #4752c4;
@@ -61,16 +64,18 @@
     #status {
       margin-top: 15px;
       font-style: italic;
+      max-width: 900px;
+      width: 90%;
     }
     .btn-group {
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
   </style>
   <script src="https://mlc.ai/web-llm/dist/index.js"></script>
 </head>
 <body>
 
-<header>Add Code Comments</header>
+<header>Add Comments to Code</header>
 
 <select id="modelSelector" aria-label="Select AI Model">
   <option value="llama2-7b-chat.ggmlv3.q4_0.bin">LLaMA 2 7B Chat</option>
@@ -78,7 +83,7 @@
   <option value="falcon-7b.bin">Falcon 7B</option>
 </select>
 
-<textarea id="codeInput" placeholder="Paste your code here to add comments..."></textarea>
+<textarea id="inputCode" placeholder="Paste your code here to add comments..."></textarea>
 
 <div class="btn-group">
   <button onclick="runCommenting()">Add Comments</button>
@@ -87,7 +92,7 @@
   <button onclick="goBack()">Back</button>
 </div>
 
-<div id="status">Waiting to start...</div>
+<div id="status">Waiting to add comments...</div>
 
 <script>
   let model;
@@ -101,51 +106,48 @@
   }
 
   async function runCommenting() {
-    const code = document.getElementById('codeInput').value.trim();
+    const code = document.getElementById('inputCode').value.trim();
     if (!code) {
-      alert('Please enter some code to comment.');
+      alert('Please enter some code to add comments.');
       return;
     }
     if (!model) {
       alert('Model not loaded yet. Loading now...');
       await loadModel();
     }
-
-    document.getElementById('status').textContent = 'Adding comments...';
-
-    const prompt = `Add clear, concise comments to this code to explain its functionality:\n\n${code}\n\nCode with comments:`;
+    document.getElementById('status').textContent = 'Adding comments to code...';
+    const prompt = `Add detailed and clear comments to the following code:\n\n${code}\n\nCommented code:`;
 
     try {
       const output = await model.generate(prompt, {
-        max_new_tokens: 250,
-        temperature: 0.6
+        max_new_tokens: 300,
+        temperature: 0.7
       });
-
       lastResult = output.text.trim();
-      document.getElementById('codeInput').value = lastResult;
-      document.getElementById('status').textContent = 'Comments added! Review the updated code.';
-    } catch (error) {
-      console.error(error);
-      document.getElementById('status').textContent = 'Error occurred while adding comments.';
+      document.getElementById('inputCode').value = lastResult;
+      document.getElementById('status').textContent = 'Comments added! Review results below.';
+    } catch (e) {
+      console.error(e);
+      document.getElementById('status').textContent = 'Error during commenting.';
     }
   }
 
   function saveResult() {
     if (!lastResult) {
-      alert('No result to save yet.');
+      alert('No commented code to save yet.');
       return;
     }
-    const key = `commented_code_${Date.now()}`;
+    const key = `commenting_${Date.now()}`;
     localStorage.setItem(key, lastResult);
-    alert(`Result saved locally as "${key}".`);
+    alert(`Saved commented code as "${key}".`);
   }
 
   function redo() {
     if (!lastResult) {
-      alert('No previous result to redo. Please run the commenting first.');
+      alert('No previous commented code to redo. Run add comments first.');
       return;
     }
-    document.getElementById('codeInput').value = lastResult;
+    document.getElementById('inputCode').value = lastResult;
     runCommenting();
   }
 
@@ -153,13 +155,11 @@
     window.location.href = 'index.html';
   }
 
-  // Load initial model on page load
   loadModel().catch(err => {
-    console.error('Failed to load model:', err);
     document.getElementById('status').textContent = 'Failed to load model.';
+    console.error(err);
   });
 
-  // Reload model on model selection change
   document.getElementById('modelSelector').addEventListener('change', () => {
     model = null;
     document.getElementById('status').textContent = 'Model changed. Reload to activate.';
