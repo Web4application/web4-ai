@@ -35,6 +35,7 @@
       font-size: 11px;
       text-align: center;
       transition: background-color 0.3s ease;
+      position: relative;
     }
     .nav-btn:hover {
       background-color: #4752c4;
@@ -63,11 +64,14 @@
       margin-left: 80px; /* same as sidebar width */
       padding: 20px;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f6f7;
+      height: 100vh;
+      overflow-y: auto;
     }
 
     /* File loader styles */
     #fileManagement {
-      background: #f9f9f9;
+      background: white;
       padding: 20px;
       border-radius: 10px;
       max-width: 600px;
@@ -115,7 +119,6 @@
 
   <script>
     function navigateTo(page) {
-      // Opens the page in the same tab — you can change to window.open(page, '_blank') for new tab
       window.location.href = page;
     }
 
@@ -125,14 +128,13 @@
         alert('Please select files to load.');
         return;
       }
-      // Example placeholder for loading files
       alert(`${input.files.length} file(s) loaded — implement your logic here.`);
-      // You’d parse and store the files here for AI processing later
+      // TODO: add your file handling logic here (e.g., localForage storage)
     }
 
     function downloadAll() {
       alert('Downloading all project files — implement your logic here.');
-      // Use JSZip or similar for zipping and downloading
+      // TODO: add your project zipping and downloading logic here (e.g., JSZip)
     }
   </script>
 
