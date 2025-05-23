@@ -11,7 +11,7 @@ services:
     startCommand: "uvicorn app:app --host 0.0.0.0 --port 8080"
     envVars:
       - key: ALLOW_ORIGIN
-        value: https://web4api.onrender.com
+        value: https://web4-5wyzznp2l-web4-0098887a.vercel.app
       - key: SENTRY_DSN
         value: https://55038c1e414932ec8d81c34e5ef120fa@o4509364065402880.ingest.de.sentry.io/4509364112457808
 """
@@ -26,7 +26,7 @@ railway_json = """
     "startCommand": "uvicorn app:app --host 0.0.0.0 --port $PORT"
   },
   "env": {
-    "ALLOW_ORIGIN": "https://web4api.onrender.com",
+    "ALLOW_ORIGIN": "https://web4-5wyzznp2l-web4-0098887a.vercel.app",
     "SENTRY_DSN": "https://55038c1e414932ec8d81c34e5ef120fa@o4509364065402880.ingest.de.sentry.io/4509364112457808"
   }
 }
