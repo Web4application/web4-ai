@@ -4,24 +4,44 @@
   <meta charset="UTF-8" />
   <title>Analyze Code - Web4 AI</title>
   <style>
+    /* Same Discord style as before */
     body {
       background-color: #36393f;
       color: #dcddde;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0; padding: 2rem;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
+      margin: 2rem;
+      user-select: none;
     }
     header {
       font-weight: 700;
       font-size: 1.8rem;
       margin-bottom: 1rem;
-      user-select: none;
+    }
+    nav a {
+      color: #dcddde;
+      text-decoration: none;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      display: inline-block;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+    select {
+      background-color: #2f3136;
+      border: none;
+      color: #dcddde;
+      padding: 8px;
+      border-radius: 6px;
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+      width: 100%;
+      max-width: 300px;
+      cursor: pointer;
     }
     textarea {
       width: 100%;
-      height: 250px;
+      height: 280px;
       background-color: #2f3136;
       border: none;
       border-radius: 8px;
@@ -52,140 +72,105 @@
     button:hover {
       background-color: #4752c4;
     }
-    #modelSelector {
-      background-color: #2f3136;
-      border: none;
-      color: #dcddde;
-      padding: 8px;
-      border-radius: 6px;
-      font-size: 1rem;
-      margin-bottom: 1.5rem;
-      width: 100%;
-      max-width: 300px;
-      cursor: pointer;
-      user-select: none;
-    }
-    nav a {
-      color: #dcddde;
-      text-decoration: none;
-      font-weight: 600;
-      margin-right: 1rem;
-      user-select: none;
-    }
-    nav a:hover {
-      text-decoration: underline;
-    }
   </style>
   <script src="https://mlc.ai/web-llm/dist/index.js"></script>
 </head>
 <body>
 
-  <header>Analyze Code</header>
-  
-  <nav>
-    <a href="index.html">← Back to Home</a>
-  </nav>
-  
-  <label for="modelSelector">Select AI Model</label>
-  <select id="modelSelector">
-    <option value="llama2-7b-chat.ggmlv3.q4_0.bin">LLaMA 2 7B Chat</option>
-    <option value="gpt4all-lora.bin">GPT4All LoRA</option>
-    <option value="wizard-vicuna-13b.bin">Wizard Vicuna 13B</option>
-    <option value="ggml-alpaca-7b-q4.bin">Alpaca 7B Q4</option>
-  </select>
+<header>Analyze Code</header>
 
-  <div id="taskStatus">Waiting to analyze code...</div>
-  <textarea id="inputCode" placeholder="Paste your code here to analyze..."></textarea>
+<nav><a href="index.html">← Back to Home</a></nav>
 
-  <div>
-    <button onclick="runAnalyze()">Analyze Code</button>
-    <button onclick="saveResult()">Save Result</button>
-    <button onclick="redo()">Redo</button>
-  </div>
+<label for="modelSelector">Select AI Model</label>
+<select id="modelSelector">
+  <option value="llama2-7b-chat.ggmlv3.q4_0.bin">LLaMA 2 7B Chat</option>
+  <option value="gpt4all-lora.bin">GPT4All LoRA</option>
+  <option value="wizard-vicuna-13b.bin">Wizard Vicuna 13B</option>
+  <option value="ggml-alpaca-7b-q4.bin">Alpaca 7B Q4</option>
+</select>
 
-  <script>
-    let model, lastResult = '';
+<div id="taskStatus">Waiting for input to analyze...</div>
+<textarea id="inputCode" placeholder="Paste your code here to analyze..."></textarea>
 
-    const modelSelector = document.getElementById('modelSelector');
-    modelSelector.value = localStorage.getItem('selectedModel') || modelSelector.value;
+<div>
+  <button onclick="runAnalyze()">Analyze</button>
+  <button onclick="saveResult()">Save Result</button>
+</div>
 
-    modelSelector.addEventListener('change', () => {
-      localStorage.setItem('selectedModel', modelSelector.value);
-      alert(`AI Model set to: ${modelSelector.options[modelSelector.selectedIndex].text}`);
-      if (model) {
-        loadModel();
-      }
+<script>
+  let model, lastResult = '';
+
+  const modelSelector = document.getElementById('modelSelector');
+  modelSelector.value = localStorage.getItem('selectedModel') || modelSelector.value;
+
+  modelSelector.addEventListener('change', () => {
+    localStorage.setItem('selectedModel', modelSelector.value);
+    alert(`AI Model set to: ${modelSelector.options[modelSelector.selectedIndex].text}`);
+    if (model) {
+      loadModel();
+    }
+  });
+
+  async function loadModel() {
+    document.getElementById('taskStatus').textContent = 'Loading model...';
+    model = await mlc.llm.load({
+      model: modelSelector.value,
+      verbose: true
     });
+    document.getElementById('taskStatus').textContent = 'Model loaded! Ready to analyze.';
+  }
 
-    async function loadModel() {
-      document.getElementById('taskStatus').textContent = 'Loading model...';
-      model = await mlc.llm.load({
-        model: modelSelector.value,
-        verbose: true
+  async function runAnalyze() {
+    const code = document.getElementById('inputCode').value.trim();
+    if (!code) {
+      alert('Please enter some code to analyze.');
+      return;
+    }
+    if (!model) {
+      alert('Model not loaded yet. Loading now...');
+      await loadModel();
+    }
+
+    document.getElementById('taskStatus').textContent = 'Analyzing code...';
+
+    const prompt = `Analyze this code for structure, potential bugs, and improvements:\n\n${code}\n\nAnalysis:`;
+
+    try {
+      const output = await model.generate(prompt, {
+        max_new_tokens: 200,
+        temperature: 0.6
       });
-      document.getElementById('taskStatus').textContent = 'Model loaded! Ready to analyze.';
-    }
-
-    async function runAnalyze() {
-      const code = document.getElementById('inputCode').value.trim();
-      if (!code) {
-        alert('Please enter some code to analyze.');
-        return;
-      }
-      if (!model) {
-        alert('Model not loaded yet. Loading now...');
-        await loadModel();
-      }
-
-      document.getElementById('taskStatus').textContent = 'Analyzing code...';
-
-      const prompt = `Analyze this code for functionality, potential bugs, and improvements:\n\n${code}\n\nAnalysis:`;
-
-      try {
-        const output = await model.generate(prompt, {
-          max_new_tokens: 300,
-          temperature: 0.7
-        });
-        lastResult = output.text.trim();
-        document.getElementById('taskStatus').textContent = 'Analysis complete! Review below.';
-        document.getElementById('inputCode').value = lastResult;
-      } catch (err) {
-        document.getElementById('taskStatus').textContent = 'Analysis failed.';
-        console.error(err);
-      }
-    }
-
-    function saveResult() {
-      if (!lastResult) {
-        alert('No analysis results to save yet.');
-        return;
-      }
-      const blob = new Blob([lastResult], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `analysis_result_${Date.now()}.txt`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-      alert('Analysis result saved as text file.');
-    }
-
-    function redo() {
-      if (!lastResult) {
-        alert('No previous analysis to redo. Run analysis first.');
-        return;
-      }
+      lastResult = output.text.trim();
+      document.getElementById('taskStatus').textContent = 'Analysis complete! Review results below.';
       document.getElementById('inputCode').value = lastResult;
-      runAnalyze();
-    }
-
-    loadModel().catch(err => {
-      document.getElementById('taskStatus').textContent = 'Failed to load model.';
+    } catch (err) {
+      document.getElementById('taskStatus').textContent = 'Analysis failed.';
       console.error(err);
-    });
-  </script>
+    }
+  }
+
+  function saveResult() {
+    if (!lastResult) {
+      alert('No analysis results to save yet.');
+      return;
+    }
+    const blob = new Blob([lastResult], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `analysis_result_${Date.now()}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    alert('Analysis result saved as text file.');
+  }
+
+  loadModel().catch(err => {
+    document.getElementById('taskStatus').textContent = 'Failed to load model.';
+    console.error(err);
+  });
+</script>
 
 </body>
 </html>
