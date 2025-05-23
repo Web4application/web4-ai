@@ -7,3 +7,10 @@ source venv/bin/activate  # macOS/Linux
 venv\Scripts\activate     # Windows
 
 pip install -r requirements.txt
+
+sudo apt update && sudo apt install python3-pip nginx certbot python3-certbot-nginx
+pip3 install fastapi uvicorn
+
+uvicorn main:app --host 0.0.0.0 --port 8000
+
+sudo certbot --nginx -d api.web4ai.app
