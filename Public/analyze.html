@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Analyze Code</title>
+  <script src="https://mlc.ai/web-llm/dist/index.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; }
+    textarea, button { margin: 10px 0; width: 100%; max-width: 700px; }
+    button { padding: 10px; font-weight: bold; }
+  </style>
+</head>
+<body>
+<h1>Code Analysis</h1>
+<div id="taskStatus">Initializing...</div>
+<textarea id="inputCode" rows="12" placeholder="Paste your code to analyze..."></textarea>
+<br>
+<button onclick="runTask()">Analyze</button>
+<button onclick="saveResult()">Save</button>
+<button onclick="goBack()">Back</button>
+
+<script>
+  let model, lastResult = '';
+
+  async function loadModel() {
+    document.getElementById('taskStatus').textContent = 'Loading model...';
+    model = await mlc.llm.load({ model: "llama2-7b-chat.ggmlv3.q4_0.bin", verbose: true });
+    document.getElementById('taskStatus').textContent = 'Model ready for analysis.';
+  }
+
+  async function runTask() {
+    const code = document.getElementById('inputCode').value.trim();
+    if (!code) return alert('Enter code first!');
+    const prompt = `Analyze this code for bugs, structure, and optimization:\n\n${code}`;
+    const output = await model.generate(prompt, { max_new_tokens: 300 });
+    lastResult = output.text.trim();
+    document.getElementById('inputCode').value = lastResult;
+    document.getElementById('taskStatus').textContent = 'Analysis complete.';
+  }
+
+  function saveResult() {
+    localStorage.setItem(`analyze_${Date.now()}`, lastResult);
+    alert('Analysis saved.');
+  }
+
+  function goBack() {
+    window.location.href = 'index.html';
+  }
+
+  loadModel().catch(err => {
+    document.getElementById('taskStatus').textContent = 'Model failed to load.';
+    console.error(err);
+  });
+</script>
+</body>
+</html>
