@@ -2,19 +2,63 @@
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Web4AI Project Assistant</title>
-  <link rel="icon" href="ChatGPT Image May 10, 2025 at 09_59_53 PM.png" />
-  <meta name="description" content="AI-powered assistant for developers to help with code refactoring and file management." />
-  
-  <!-- Add any other meta tags, links to CSS, or other head elements here -->
+  <title>Web4 AI Project Assistant</title>
+  <style>
+    body {
+      background-color: #36393f;
+      color: #dcddde;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0; padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      user-select: none;
+    }
+    header {
+      font-weight: 700;
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+    }
+    .button-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    a.button {
+      background-color: #5865f2;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      flex: 1 1 160px;
+      text-align: center;
+      user-select: none;
+    }
+    a.button:hover {
+      background-color: #4752c4;
+    }
+  </style>
 </head>
-
 <body>
-  <div id="root"></div> <!-- React hooks into this div -->
-</body>
 
+<header>Web4 AI Project Assistant</header>
+
+<section>
+  <h2>AI Options</h2>
+  <div class="button-container">
+    <a href="refactor.html" class="button">Run AI Refactor</a>
+    <a href="analyze.html" class="button">Analyze Code</a>
+    <a href="docgen.html" class="button">Generate Documentation</a>
+    <a href="format.html" class="button">Format Code</a>
+    <a href="unittests.html" class="button">Generate Unit Tests</a>
+    <a href="commenting.html" class="button">Add Code Comments</a>
+  </div>
+</section>
+
+</body>
 </html>
