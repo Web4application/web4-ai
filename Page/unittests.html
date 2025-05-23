@@ -16,44 +16,47 @@
       min-height: 100vh;
     }
     header {
-      font-size: 1.8rem;
+      font-size: 2rem;
       margin-bottom: 20px;
       font-weight: bold;
     }
     textarea {
       width: 90%;
-      max-width: 800px;
-      height: 200px;
+      max-width: 900px;
+      height: 250px;
       background-color: #2f3136;
       border: none;
       border-radius: 8px;
       color: #dcddde;
-      padding: 12px;
+      padding: 15px;
       font-family: monospace;
       font-size: 1rem;
       resize: vertical;
-      margin-bottom: 15px;
+      margin-bottom: 20px;
     }
     select {
       background-color: #2f3136;
       color: #dcddde;
       border: none;
       border-radius: 6px;
-      padding: 8px;
-      margin-bottom: 15px;
+      padding: 10px;
+      margin-bottom: 20px;
       font-weight: bold;
       cursor: pointer;
+      max-width: 900px;
+      width: 90%;
     }
     button {
       background-color: #5865f2;
       border: none;
       border-radius: 6px;
       color: white;
-      padding: 10px 20px;
+      padding: 12px 25px;
       font-weight: bold;
       cursor: pointer;
-      margin-right: 10px;
+      margin: 5px;
       transition: background-color 0.2s ease;
+      font-size: 1rem;
     }
     button:hover {
       background-color: #4752c4;
@@ -61,9 +64,11 @@
     #status {
       margin-top: 15px;
       font-style: italic;
+      max-width: 900px;
+      width: 90%;
     }
     .btn-group {
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
   </style>
   <script src="https://mlc.ai/web-llm/dist/index.js"></script>
@@ -78,16 +83,16 @@
   <option value="falcon-7b.bin">Falcon 7B</option>
 </select>
 
-<textarea id="codeInput" placeholder="Paste your code here to generate unit tests..."></textarea>
+<textarea id="inputCode" placeholder="Paste your code here to generate unit tests..."></textarea>
 
 <div class="btn-group">
-  <button onclick="runUnitTests()">Generate Unit Tests</button>
+  <button onclick="runUnitTests()">Generate Tests</button>
   <button onclick="saveResult()">Save</button>
   <button onclick="redo()">Redo</button>
   <button onclick="goBack()">Back</button>
 </div>
 
-<div id="status">Waiting to start...</div>
+<div id="status">Waiting to generate unit tests...</div>
 
 <script>
   let model;
@@ -101,7 +106,7 @@
   }
 
   async function runUnitTests() {
-    const code = document.getElementById('codeInput').value.trim();
+    const code = document.getElementById('inputCode').value.trim();
     if (!code) {
       alert('Please enter some code to generate unit tests.');
       return;
@@ -110,42 +115,39 @@
       alert('Model not loaded yet. Loading now...');
       await loadModel();
     }
-
     document.getElementById('status').textContent = 'Generating unit tests...';
-
-    const prompt = `Generate comprehensive unit tests for the following code:\n\n${code}\n\nUnit tests:`;
+    const prompt = `Generate unit tests for the following code:\n\n${code}\n\nUnit tests:`;
 
     try {
       const output = await model.generate(prompt, {
-        max_new_tokens: 250,
-        temperature: 0.6
+        max_new_tokens: 350,
+        temperature: 0.7
       });
-
       lastResult = output.text.trim();
-      document.getElementById('codeInput').value = lastResult;
-      document.getElementById('status').textContent = 'Unit tests generated! Review the output.';
-    } catch (error) {
-      console.error(error);
-      document.getElementById('status').textContent = 'Error occurred while generating unit tests.';
+      document.getElementById('inputCode').value = lastResult;
+      document.getElementById('status').textContent = 'Unit tests generated! Review results below.';
+    } catch (e) {
+      console.error(e);
+      document.getElementById('status').textContent = 'Error during unit test generation.';
     }
   }
 
   function saveResult() {
     if (!lastResult) {
-      alert('No result to save yet.');
+      alert('No unit tests result to save yet.');
       return;
     }
-    const key = `unit_tests_${Date.now()}`;
+    const key = `unittests_${Date.now()}`;
     localStorage.setItem(key, lastResult);
-    alert(`Result saved locally as "${key}".`);
+    alert(`Saved unit tests as "${key}".`);
   }
 
   function redo() {
     if (!lastResult) {
-      alert('No previous result to redo. Please run the generation first.');
+      alert('No previous unit tests to redo. Run generate tests first.');
       return;
     }
-    document.getElementById('codeInput').value = lastResult;
+    document.getElementById('inputCode').value = lastResult;
     runUnitTests();
   }
 
@@ -153,13 +155,11 @@
     window.location.href = 'index.html';
   }
 
-  // Load initial model on page load
   loadModel().catch(err => {
-    console.error('Failed to load model:', err);
     document.getElementById('status').textContent = 'Failed to load model.';
+    console.error(err);
   });
 
-  // Reload model on model selection change
   document.getElementById('modelSelector').addEventListener('change', () => {
     model = null;
     document.getElementById('status').textContent = 'Model changed. Reload to activate.';
