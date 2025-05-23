@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Generate Unit Tests - Web4 AI</title>
+  <style>
+    body {
+      background-color: #36393f;
+      color: #dcddde;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0; padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    header {
+      font-weight: 700;
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      user-select: none;
+    }
+    nav a {
+      color: #dcddde;
+      text-decoration: none;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      user-select: none;
+      display: inline-block;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+    #modelSelector {
+      background-color: #2f3136;
+      border: none;
+      color: #dcddde;
+      padding: 8px;
+      border-radius: 6px;
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+      width: 100%;
+      max-width: 300px;
+      cursor: pointer;
+      user-select: none;
+    }
+    textarea {
+      width: 100%;
+      height: 280px;
+      background-color: #2f3136;
+      border: none;
+      border-radius: 8px;
+      color: #dcddde;
+      padding: 1rem;
+      font-family: monospace;
+      font-size: 1rem;
+      resize: vertical;
+      margin-bottom: 1rem;
+    }
+    #taskStatus {
+      margin-bottom: 1rem;
+      font-weight: 600;
+      min-height: 24px;
+    }
+    button {
+      background-color: #5865f2;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 10px 20px;
+      margin-right: 10px;
+      user-select: none;
+      transition: background-color 0.2s ease;
+    }
+    button:hover {
+      background-color: #4752c4;
+    }
+  </style>
+  <script src="https://mlc.ai/web-llm/dist/index.js"></script>
+</head>
+<body>
+
+<header>Generate Unit Tests</header>
+
+<nav>
+  <a href="index.html">← Back to Home</a>
+</nav>
+
+<label for="modelSelector">Select AI Model</label>
+<select id="modelSelector">
+  <option value="llama2-7b-chat.ggmlv3.q4_0.bin">LLaMA 2 7B Chat</option>
+  <option value="gpt4all-lora.bin">GPT4All LoRA</option>
+  <option value="wizard-vicuna-13b.bin">Wizard Vicuna 13B</option>
+  <option value="ggml-alpaca-7b-q4.bin">Alpaca 7B Q4</option>
+</select>
+
+<div id="taskStatus">Waiting to generate unit tests...</div>
+<textarea id="inputCode" placeholder="Paste your source code here to generate unit tests..."></textarea>
+
+<div>
+  <button onclick="runGenerate()">Generate Tests</button>
+  <button onclick="saveResult()">Save Result</button>
+  <button onclick="redo()">Redo</button>
+</div>
+
+<script>
+  let model, lastResult = '';
+
+  const modelSelector = document.getElementById('modelSelector');
+  modelSelector.value = localStorage.getItem('selectedModel') || modelSelector.value;
+
+  modelSelector.addEventListener('change', () => {
+    localStorage.setItem('selectedModel', modelSelector.value);
+    alert(`AI Model set to: ${modelSelector.options[modelSelector.selectedIndex].text}`);
+    if (model) {
+      loadModel();
+    }
+  });
+
+  async function loadModel() {
+    document.getElementById('taskStatus').textContent = 'Loading model...';
+    model = await mlc.llm.load({
+      model: modelSelector.value,
+      verbose: true
+    });
+    document.getElementById('taskStatus').textContent = 'Model loaded! Ready to generate unit tests.';
+  }
+
+  async function runGenerate() {
+    const code = document.getElementById('inputCode').value.trim();
+    if (!code) {
+      alert('Please enter some source code to generate tests for.');
+      return;
+    }
+    if (!model) {
+      alert('Model not loaded yet. Loading now...');
+      await loadModel();
+    }
+
+    document.getElementById('taskStatus').textContent = 'Generating unit tests...';
+
+    const prompt = `Generate comprehensive unit tests for the following code:\n\n${code}\n\nUnit tests:`;
+
+    try {
+      const output = await model.generate(prompt, {
+        max_new_tokens: 350,
+        temperature: 0.7
+      });
+      lastResult = output.text.trim();
+      document.getElementById('taskStatus').textContent = 'Unit tests generated! Review below.';
+      document.getElementById('inputCode').value = lastResult;
+    } catch (err) {
+      document.getElementById('taskStatus').textContent = 'Failed to generate unit tests.';
+      console.error(err);
+    }
+  }
+
+  function saveResult() {
+    if (!lastResult) {
+      alert('No generated tests to save yet.');
+      return;
+    }
+    const blob = new Blob([lastResult], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `unit_tests_${Date.now()}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    alert('Unit tests saved as text file.');
+  }
+
+  function redo() {
+    if (!lastResult) {
+      alert('No previous generation to redo. Generate tests first.');
+      return;
+    }
+    document.getElementById('inputCode').value = lastResult;
+    runGenerate();
+  }
+
+  loadModel().catch(err => {
+    document.getElementById('taskStatus').textContent = 'Failed to load model.';
+    console.error(err);
+  });
+</script>
+
+</body>
+</html>
