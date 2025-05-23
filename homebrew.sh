@@ -14,3 +14,8 @@ pip3 install fastapi uvicorn
 uvicorn main:app --host 0.0.0.0 --port 8000
 
 sudo certbot --nginx -d api.web4ai.app
+
+ln -s /etc/nginx/sites-available/web4ai /etc/nginx/sites-enabled/
+nginx -t
+sudo systemctl restart nginx
+
