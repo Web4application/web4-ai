@@ -58,3 +58,15 @@ async function runAITask(tool, inputCode) {
     return data.output;
   }
 }
+
+const response = await fetch('http://localhost:3000/web4ai/process', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    model: AppState.selectedModel,
+    tool: 'comment',
+    input: 'function login(user) { return user.token; }'
+  })
+});
+const data = await response.json();
+console.log(data.output); // Render in UI
