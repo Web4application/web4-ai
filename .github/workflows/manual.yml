@@ -87,11 +87,11 @@ jobs:
         with:
           slack-message: "🚀 Web4AI deployed to staging!"
           slack-webhook-url: ${{ secrets.SLACK_WEBHOOK }}
-
-    greet:
-  name: Send greeting
-  runs-on: ubuntu-latest
-  steps:
+          
+  greet:
+   name: Send greeting
+   runs-on: ubuntu-latest
+   steps:
       - name: Greet user
         run: echo "Hello ${{ inputs.name }} 👋"
 
