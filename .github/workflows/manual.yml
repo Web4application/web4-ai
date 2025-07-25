@@ -1,3 +1,4 @@
+
 name: Manual workflow
 
 on:
@@ -87,10 +88,10 @@ jobs:
           slack-message: "🚀 Web4AI deployed to staging!"
           slack-webhook-url: ${{ secrets.SLACK_WEBHOOK }}
 
-  greet:
-    name: Send greeting
-    runs-on: ubuntu-latest
-    steps:
+    greet:
+  name: Send greeting
+  runs-on: ubuntu-latest
+  steps:
       - name: Greet user
         run: echo "Hello ${{ inputs.name }} 👋"
 
@@ -110,3 +111,16 @@ jobs:
               repo: context.repo.repo,
               body: "🚀 Deployment ready. React with 👍 to approve or 👎 to deny."
             })
+
+            
+      - name: 🧪 Install & Test dependencies
+        run: |
+         if [ -f package-lock.json ]; then
+         echo "🔒 Lockfile found — running npm ci"
+         npm ci
+         else
+         echo "⚠️ No lockfile — running npm install"
+         npm install
+         fi
+         npm run build --if-present
+         npm test
