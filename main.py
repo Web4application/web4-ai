@@ -1,7 +1,13 @@
-from fastapi import FastAPI
+# main.py
+from flask import Flask, request, jsonify
+from project_pilot import run_tool
 
-app = FastAPI()
+app = Flask(__name__)
 
-@app.get("/")
-def root():
-    return {"message": "Web4AI API is live!"}
+@app.route('/web4ai/python', methods=['POST'])
+def handle_request():
+    data = request.json
+    result = run_tool(data['tool'], data['input'])
+    return jsonify({ "output": result })
+
+app.run(port=5000)
