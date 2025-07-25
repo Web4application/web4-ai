@@ -20,7 +20,17 @@ jobs:
         node-version: '18'
 
     - name: 📦 Install dependencies
-      run: npm ci
+      run: npm install
+
+      - name: 📦 Install dependencies
+  run: |
+    if [ -f package-lock.json ]; then
+      npm ci
+    else
+      echo "⚠️ package-lock.json not found, falling back to npm install"
+      npm install
+    fi
+
 
     - name: 🔧 Run AI Enhancer
       run: node backend/runAITasks.js
