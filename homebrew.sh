@@ -31,3 +31,8 @@ Options:
   --unit-test      Scaffold unit tests
   --offline        Use WebLLM instead of GPT-4
 
+  npx web4ai-refactor src/
+# or with options
+web4ai-refactor src/ --refactor --comment --docgen
+
+
