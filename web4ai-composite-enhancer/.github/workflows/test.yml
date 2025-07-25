@@ -1,0 +1,11 @@
+name: Test Web4AI Enhancer
+on: push
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./ # run local composite action
+        with:
+          node-version: '20'
