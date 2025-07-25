@@ -12,7 +12,6 @@ some-package @ git+https://github.com/username/repo.git@branch
 
 # If you depend on mypyc-compiled wheels, do NOT add `find-links` here.
 Instead, use the pip install command or config file described below.
-
 Flask==2.3.2
 openai==0.28.1
 numpy==1.24.2

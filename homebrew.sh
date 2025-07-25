@@ -17,7 +17,8 @@ sudo certbot --nginx -d api.web4ai.app
 
 ln -s /etc/nginx/sites-available/web4ai /etc/nginx/sites-enabled/
 nginx -t
-sudo systemctl restart nginx
+sudo systemctl restart nginx 
+
 🌐 Web4AI Refactor CLI 🚀
 Refactor, comment, and document code using AI
 
@@ -34,5 +35,3 @@ Options:
   npx web4ai-refactor src/
 # or with options
 web4ai-refactor src/ --refactor --comment --docgen
-
-
