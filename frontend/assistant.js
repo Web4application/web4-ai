@@ -1,3 +1,5 @@
+<script src="https://huggingface.co/webllm/webllm.js"></script>
+
 async function runAITask(tool, input) {
   const model = localStorage.getItem('selectedModel') || 'gpt-4';
   const isOnline = navigator.onLine;
@@ -70,3 +72,16 @@ const response = await fetch('http://localhost:3000/web4ai/process', {
 });
 const data = await response.json();
 console.log(data.output); // Render in UI
+
+async function runWithWebLLM(input, tool) {
+  const webllm = await WebLLM.create();
+  const prompt = {
+    refactor: `Refactor this code:\n${input}`,
+    comment: `Add comments:\n${input}`,
+    docs: `Generate documentation:\n${input}`,
+    tests: `Create unit tests:\n${input}`
+  };
+
+  const result = await webllm.chat(prompt[tool], { model: AppState.selectedModel });
+  return result.output;
+}
