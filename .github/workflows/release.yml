@@ -1,0 +1,61 @@
+name: Fancy Release Workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    name: 🚀 Ship It!
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v3
+
+    - name: 🏷️ Get Latest Tag
+      id: latest_tag
+      run: echo "latest_tag=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
+
+    - name: 🧠 Determine New Version from PR Labels
+      id: version_bump
+      run: |
+        labels=$(gh pr view --json labels -q ".labels[].name")
+        if echo "$labels" | grep -q "major"; then bump="major"
+        elif echo "$labels" | grep -q "minor"; then bump="minor"
+        else bump="patch"
+        fi
+
+        version=$(echo "${{ env.latest_tag }}" | awk -F. -v b="$bump" '{
+          if (b=="major") $1++;
+          else if (b=="minor") $2++;
+          else $3++;
+          print "v"$1"."$2"."$3
+        }')
+        echo "next_version=$version" >> $GITHUB_ENV
+
+    - name: ✍️ Generate Changelog with Emojis
+      run: |
+        echo "## 📦 Changes in ${{ env.next_version }}:" > changelog.md
+        git log ${{ env.latest_tag }}..HEAD --pretty=format:"- 💡 %s" >> changelog.md
+
+    - name: 📢 Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ env.next_version }}
+        name: Release ${{ env.next_version }}
+        body_path: changelog.md
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: 💬 Comment on PR
+      run: |
+        gh pr comment ${{ github.event.pull_request.number }} --body "🎉 Released as [${{ env.next_version }}](https://github.com/${{ github.repository }}/releases/tag/${{ env.next_version }})"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: 🔔 Slack Notification (Optional)
+      if: success()
+      run: |
+        curl -X POST -H 'Content-type: application/json' --data '{"text":"New release: ${{ env.next_version }} is live!"}' ${{ secrets.SLACK_WEBHOOK }}
