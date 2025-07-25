@@ -1,0 +1,34 @@
+name: Web4AI Automation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  ai-enhancement:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v3
+
+    - name: 🧠 Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: 📦 Install dependencies
+      run: npm ci
+
+    - name: 🔧 Run AI Enhancer
+      run: node backend/runAITasks.js
+
+    - name: 🚀 Commit AI-enhanced files
+      run: |
+        git config --global user.name 'Web4AI Bot'
+        git config --global user.email 'web4ai@ci.com'
+        git add .
+        git commit -m "🔁 AI-enhanced: automated refactor & docs"
+        git push
