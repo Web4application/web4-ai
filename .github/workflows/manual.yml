@@ -1,6 +1,4 @@
-
 name: Manual workflow
-
 on:
   push:
     branches: [main, release/*]
