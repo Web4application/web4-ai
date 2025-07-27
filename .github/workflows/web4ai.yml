@@ -20,7 +20,13 @@ jobs:
         node-version: '18'
 
     - name: 📦 Install dependencies
-      run: npm ci
+      run: |
+       if [ -f package-lock.json ]; then
+       npm ci
+       else
+       echo "⚠️ package-lock.json not found, falling back to npm install"
+       npm install
+       fi
 
     - name: 🔧 Run AI Enhancer
       run: node backend/runAITasks.js
@@ -32,3 +38,11 @@ jobs:
         git add .
         git commit -m "🔁 AI-enhanced: automated refactor & docs"
         git push
+        
+     - name: ⏱️ Cache node modules
+       uses: actions/cache@v3
+       with:
+       path: ~/.npm
+       key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+       restore-keys: |
+         ${{ runner.os }}-node-
