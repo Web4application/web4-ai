@@ -1,9 +1,9 @@
 {
-  "name": "gpt-5-mini",
+  "name": "web4-ai",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vue",
     "build": "vite build",
     "preview": "vite preview",
     "start": "node server.js",
