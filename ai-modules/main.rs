@@ -11,7 +11,6 @@ async function run(model, input) {
   return result;
 }
 
-
 run("@cf/meta/llama-3-8b-instruct", {
   messages: [
     {
